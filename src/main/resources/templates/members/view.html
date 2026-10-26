@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Member Profile | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar" style="margin-bottom: 24px;">
+        <a th:href="@{/members}" class="btn btn-secondary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span> Back to Members
+        </a>
+        <div class="btn-group">
+            <a th:href="@{/members/edit/{id}(id=${member.id})}" class="btn btn-primary btn-sm">
+                <span class="material-symbols-rounded" style="font-size:16px;">edit</span> Edit Member
+            </a>
+        </div>
+    </div>
+
+    <!-- 2-Column Responsive Workspace -->
+    <div style="display: grid; grid-template-columns: minmax(320px, 460px) minmax(320px, 500px); gap: 24px; align-items: start;">
+        
+        <!-- Profile Identity Card -->
+        <div class="profile-card" style="max-width: none; width: 100%;">
+            <div class="profile-avatar" th:text="${#strings.substring(member.name, 0, 1)}">A</div>
+            <div class="profile-name" th:text="${member.name}" style="margin-top: 14px;">Member Name</div>
+            <div style="color:var(--tx-muted);font-size:13px;margin-top:4px;">
+                Member since <strong style="color:var(--tx);" th:text="${#temporals.format(member.joinDate, 'dd MMM yyyy')}">01 Jan 2026</strong>
+            </div>
+
+            <div class="profile-info" style="margin-top: 24px;">
+                <div class="profile-row">
+                    <span class="label">Member ID</span>
+                    <strong style="color: #c084fc;" th:text="'#' + ${member.id}">#1</strong>
+                </div>
+                <div class="profile-row">
+                    <span class="label">Phone</span>
+                    <span th:text="${member.phone}">98XXXXXXXX</span>
+                </div>
+                <div class="profile-row">
+                    <span class="label">Email</span>
+                    <span th:text="${member.email ?: 'N/A'}">email@example.com</span>
+                </div>
+                <div class="profile-row">
+                    <span class="label">Age &amp; Gender</span>
+                    <span><span th:text="${member.age}">25</span> yrs &bull; <span th:text="${member.gender}">Male</span></span>
+                </div>
+                <div class="profile-row">
+                    <span class="label">Address</span>
+                    <span th:text="${member.address ?: 'N/A'}">City</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Management Card -->
+        <div class="card" style="padding: 28px 24px;">
+            <div class="card-title" style="font-size: 16px; margin-bottom: 6px;">Member Management</div>
+            <p style="color: var(--tx-muted); font-size: 13px; margin-bottom: 20px;">
+                Quick operations and workflows for <strong style="color: var(--tx);" th:text="${member.name}">Member</strong>.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a th:href="@{/subscriptions/add(memberId=${member.id})}" class="btn btn-secondary" style="justify-content: flex-start; padding: 12px 18px; border-radius: 12px; font-size: 14px;">
+                    <span class="material-symbols-rounded" style="color: #c084fc; font-size: 20px;">loyalty</span>
+                    <span>Assign / Renew Subscription</span>
+                </a>
+                <a th:href="@{/payments/add(memberId=${member.id})}" class="btn btn-secondary" style="justify-content: flex-start; padding: 12px 18px; border-radius: 12px; font-size: 14px;">
+                    <span class="material-symbols-rounded" style="color: #45b558; font-size: 20px;">payments</span>
+                    <span>Record Payment</span>
+                </a>
+                <a th:href="@{/attendance/mark(memberId=${member.id})}" class="btn btn-secondary" style="justify-content: flex-start; padding: 12px 18px; border-radius: 12px; font-size: 14px;">
+                    <span class="material-symbols-rounded" style="color: #38bdf8; font-size: 20px;">fact_check</span>
+                    <span>Mark Daily Attendance</span>
+                </a>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <div style="font-size: 12px; color: var(--tx-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 12px;">
+                    Direct Communication
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a th:href="'tel:' + ${member.phone}" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">call</span> Call
+                    </a>
+                    <a th:if="${member.email != null and !member.email.isEmpty()}" th:href="'mailto:' + ${member.email}" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">mail</span> Email
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

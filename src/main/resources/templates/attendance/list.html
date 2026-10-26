@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Attendance | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <span style="color:var(--tx-muted);font-size:13px;" th:text="'Showing ' + ${#lists.size(attendanceList)} + ' records'"></span>
+        <a th:href="@{/attendance/add}" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">add_circle</span> Mark Attendance
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Member</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="a, stat : ${attendanceList}">
+                    <td th:text="${stat.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/members/view/{id}(id=${a.member.id})}" class="member-link" th:title="'View ' + ${a.member.name} + '\'s profile'">
+                            <div class="member-cell">
+                                <div class="avatar" th:text="${#strings.substring(a.member.name, 0, 1)}">A</div>
+                                <span class="name" th:text="${a.member.name}">Member</span>
+                            </div>
+                        </a>
+                    </td>
+                    <td th:text="${#temporals.format(a.attendanceDate, 'dd MMM yyyy')}">01 Jan</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${a.status == 'Present'} ? 'badge-present' : 'badge-absent'"
+                              th:text="${a.status}">Present</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/attendance/delete/{id}(id=${a.id})}" class="btn btn-danger btn-sm"
+                           onclick="return confirm('Delete this record?');">Delete</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(attendanceList)}">
+                    <td colspan="5" style="text-align:center;padding:40px;color:var(--tx-muted);">
+                        No attendance records. <a th:href="@{/attendance/add}" style="color:var(--vi);">Mark attendance →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

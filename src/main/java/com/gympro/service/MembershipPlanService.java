@@ -1,0 +1,32 @@
+package com.gympro.service;
+
+import com.gympro.entity.MembershipPlan;
+import com.gympro.repository.MembershipPlanRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class MembershipPlanService {
+
+    @Autowired
+    private MembershipPlanRepository planRepository;
+
+    public List<MembershipPlan> getAllPlans() {
+        return planRepository.findAll();
+    }
+
+    public Optional<MembershipPlan> getPlanById(Long id) {
+        return planRepository.findById(id);
+    }
+
+    public MembershipPlan savePlan(MembershipPlan plan) {
+        return planRepository.save(plan);
+    }
+
+    public void deletePlan(Long id) {
+        planRepository.deleteById(id);
+    }
+}

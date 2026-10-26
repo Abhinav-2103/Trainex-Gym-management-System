@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Subscriptions | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <span style="color:var(--tx-muted);font-size:13px;" th:text="'Showing ' + ${#lists.size(subscriptions)} + ' subscriptions'"></span>
+        <a th:href="@{/subscriptions/add}" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">add_circle</span> Add Subscription
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Member</th>
+                    <th>Plan</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="s, stat : ${subscriptions}">
+                    <td th:text="${stat.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/members/view/{id}(id=${s.member.id})}" class="member-link" th:title="'View ' + ${s.member.name} + '\'s profile'">
+                            <div class="member-cell">
+                                <div class="avatar" th:text="${#strings.substring(s.member.name, 0, 1)}">A</div>
+                                <span class="name" th:text="${s.member.name}">Member</span>
+                            </div>
+                        </a>
+                    </td>
+                    <td th:text="${s.plan.planName}">Plan</td>
+                    <td th:text="${#temporals.format(s.startDate, 'dd MMM yyyy')}">01 Jan</td>
+                    <td th:text="${s.endDate != null ? #temporals.format(s.endDate, 'dd MMM yyyy') : 'N/A'}">01 Apr</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${s.status == 'Active'} ? 'badge-active' : 'badge-expired'"
+                              th:text="${s.status}">Active</span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/subscriptions/edit/{id}(id=${s.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a th:href="@{/subscriptions/delete/{id}(id=${s.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this subscription?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(subscriptions)}">
+                    <td colspan="7" style="text-align:center;padding:40px;color:var(--tx-muted);">
+                        No subscriptions found. <a th:href="@{/subscriptions/add}" style="color:var(--vi);">Create one →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

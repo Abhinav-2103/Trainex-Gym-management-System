@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Plan Form | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <a th:href="@{/plans}" class="btn btn-secondary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span> Back to Plans
+        </a>
+    </div>
+
+    <div class="form-card">
+        <form th:action="@{/plans/save}" th:object="${plan}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label for="planName">Plan Name *</label>
+                <input type="text" id="planName" th:field="*{planName}" class="form-control" placeholder="e.g. Premium Monthly">
+                <div class="form-error" th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="durationInMonths">Duration (months) *</label>
+                    <input type="number" id="durationInMonths" th:field="*{durationInMonths}" class="form-control" placeholder="3" min="1" max="24">
+                    <div class="form-error" th:if="${#fields.hasErrors('durationInMonths')}" th:errors="*{durationInMonths}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price (₹) *</label>
+                    <input type="number" id="price" th:field="*{price}" class="form-control" placeholder="2499" min="1" step="0.01">
+                    <div class="form-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+                <span class="material-symbols-rounded" style="font-size:18px;">save</span>
+                Save Plan
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

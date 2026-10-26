@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Dashboard | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <a th:href="@{/members}" class="kpi-card" title="View all members">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Members</span>
+                <span class="material-symbols-rounded kpi-icon">group</span>
+            </div>
+            <div class="kpi-value" th:text="${totalMembers}">0</div>
+            <div class="kpi-hint">Manage members &rarr;</div>
+        </a>
+        <a th:href="@{/subscriptions}" class="kpi-card" title="View active subscriptions">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Subscriptions</span>
+                <span class="material-symbols-rounded kpi-icon">loyalty</span>
+            </div>
+            <div class="kpi-value" th:text="${activeSubscriptions}">0</div>
+            <div class="kpi-hint">View subscriptions &rarr;</div>
+        </a>
+        <a th:href="@{/subscriptions}" class="kpi-card" title="View expired subscriptions">
+            <div class="kpi-header">
+                <span class="kpi-label">Expired Subscriptions</span>
+                <span class="material-symbols-rounded kpi-icon">event_busy</span>
+            </div>
+            <div class="kpi-value" th:text="${expiredSubscriptions}">0</div>
+            <div class="kpi-hint">Check status &rarr;</div>
+        </a>
+        <a th:href="@{/payments}" class="kpi-card" title="View revenue &amp; payments">
+            <div class="kpi-header">
+                <span class="kpi-label">Revenue This Month</span>
+                <span class="material-symbols-rounded kpi-icon">payments</span>
+            </div>
+            <div class="kpi-value">&#8377;<span th:text="${#numbers.formatDecimal(monthlyRevenue, 1, 0)}">0</span></div>
+            <div class="kpi-hint">View payments ledger &rarr;</div>
+        </a>
+    </div>
+
+    <!-- Charts & Recent Members -->
+    <div class="dash-grid">
+        <!-- Revenue & Attendance Chart -->
+        <div class="card">
+            <div class="card-title">Weekly Revenue &amp; Attendance</div>
+            <div style="margin-top:16px;">
+                <canvas id="performanceChart" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- Recently Joined -->
+        <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="card-title" style="margin-bottom:0;">Recently Joined</div>
+                <a th:href="@{/members}" class="btn btn-secondary btn-xs" style="font-size:12px;padding:4px 10px;">View All</a>
+            </div>
+            <div style="margin-top:8px;">
+                <a th:href="@{/members/view/{id}(id=${m.id})}" class="recent-member" th:each="m : ${recentMembers}" th:title="'View ' + ${m.name} + '\'s profile'">
+                    <div class="avatar" th:text="${#strings.substring(m.name, 0, 1)}">A</div>
+                    <div class="info">
+                        <div class="name" th:text="${m.name}">Name</div>
+                        <div class="phone" th:text="${m.phone}">Phone</div>
+                    </div>
+                    <div class="date" th:text="${#temporals.format(m.joinDate, 'dd MMM')}">01 Jan</div>
+                    <span class="material-symbols-rounded view-arrow">chevron_right</span>
+                </a>
+                <div th:if="${#lists.isEmpty(recentMembers)}" style="color:var(--tx-muted);font-size:13px;padding:16px 0;">
+                    No members yet. <a th:href="@{/members/add}" style="color:var(--vi);">Add one &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Script -->
+    <script th:inline="javascript">
+        (function(){
+            var rev = /*[[${weeklyRevenue}]]*/ [0,0,0,0,0,0];
+            var att = /*[[${weeklyAttendance}]]*/ [0,0,0,0,0,0];
+            // Parse from string representation
+            if (typeof rev === 'string') { rev = JSON.parse(rev); }
+            if (typeof att === 'string') { att = JSON.parse(att); }
+
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var gradient = ctx.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, 'rgba(147, 18, 255, 0.35)');
+            gradient.addColorStop(1, 'rgba(147, 18, 255, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: rev,
+                        borderColor: '#b04dff',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#050510',
+                        pointBorderColor: '#b04dff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Check-ins',
+                        data: att,
+                        borderColor: '#45b558',
+                        borderDash: [5, 4],
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#45b558',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#8b8998', usePointStyle: true, padding: 18, font: { size: 12 } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10,8,20,0.95)',
+                            borderColor: 'rgba(147,18,255,0.3)',
+                            borderWidth: 1,
+                            titleColor: '#f0eef5',
+                            bodyColor: '#c9bfd6',
+                            padding: 12,
+                            cornerRadius: 10
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#8b8998' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                        y: {
+                            type: 'linear', position: 'left',
+                            ticks: { color: '#b04dff', callback: function(v){ return '₹'+v; } },
+                            grid: { color: 'rgba(255,255,255,0.04)' }
+                        },
+                        y1: {
+                            type: 'linear', position: 'right',
+                            ticks: { color: '#45b558' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

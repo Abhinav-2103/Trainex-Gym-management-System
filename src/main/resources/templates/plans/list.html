@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Plans | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <span style="color:var(--tx-muted);font-size:13px;" th:text="'Showing ' + ${#lists.size(plans)} + ' plans'"></span>
+        <a th:href="@{/plans/add}" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">add_circle</span> Add Plan
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Plan Name</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p, stat : ${plans}">
+                    <td th:text="${stat.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/plans/edit/{id}(id=${p.id})}" class="member-link" th:title="'Edit ' + ${p.planName}">
+                            <span style="font-weight:600;" th:text="${p.planName}">Plan</span>
+                        </a>
+                    </td>
+                    <td th:text="${p.durationInMonths + ' months'}">1 month</td>
+                    <td th:text="'₹' + ${#numbers.formatDecimal(p.price, 1, 0)}">₹999</td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/plans/edit/{id}(id=${p.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a th:href="@{/plans/delete/{id}(id=${p.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this plan?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(plans)}">
+                    <td colspan="5" style="text-align:center;padding:40px;color:var(--tx-muted);">
+                        No plans found. <a th:href="@{/plans/add}" style="color:var(--vi);">Create one →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

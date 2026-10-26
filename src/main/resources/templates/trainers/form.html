@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Trainer Form | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <a th:href="@{/trainers}" class="btn btn-secondary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span> Back to Trainers
+        </a>
+    </div>
+
+    <div class="form-card">
+        <form th:action="@{/trainers/save}" th:object="${trainer}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Enter trainer name">
+                    <div class="form-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="text" id="phone" th:field="*{phone}" class="form-control" placeholder="98XXXXXXXX">
+                    <div class="form-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="specialization">Specialization *</label>
+                    <input type="text" id="specialization" th:field="*{specialization}" class="form-control" placeholder="e.g. Weight Training, Yoga">
+                    <div class="form-error" th:if="${#fields.hasErrors('specialization')}" th:errors="*{specialization}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="salary">Monthly Salary (₹) *</label>
+                    <input type="number" id="salary" th:field="*{salary}" class="form-control" placeholder="35000" min="1" step="0.01">
+                    <div class="form-error" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+                <span class="material-symbols-rounded" style="font-size:18px;">save</span>
+                Save Trainer
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

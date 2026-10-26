@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Members | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <div>
+            <span style="color:var(--tx-muted);font-size:13px;" th:text="'Showing ' + ${#lists.size(members)} + ' members'"></span>
+        </div>
+        <div class="btn-group">
+            <form th:action="@{/members/search}" method="get" style="display:inline-flex;gap:8px;">
+                <input type="text" name="keyword" class="form-control" style="width:220px;padding:8px 14px;font-size:13px;" placeholder="Search by name or phone..." th:value="${keyword}">
+                <button type="submit" class="btn btn-secondary btn-sm">
+                    <span class="material-symbols-rounded" style="font-size:16px;">search</span> Search
+                </button>
+            </form>
+            <a th:href="@{/members/add}" class="btn btn-primary btn-sm">
+                <span class="material-symbols-rounded" style="font-size:16px;">person_add</span> Add Member
+            </a>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Member</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="m, stat : ${members}">
+                    <td th:text="${stat.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/members/view/{id}(id=${m.id})}" class="member-link" th:title="'View ' + ${m.name} + '\'s profile'">
+                            <div class="member-cell">
+                                <div class="avatar" th:text="${#strings.substring(m.name, 0, 1)}">A</div>
+                                <div>
+                                    <div class="name" th:text="${m.name}">Name</div>
+                                    <div class="sub-text" th:text="${m.address}">Address</div>
+                                </div>
+                            </div>
+                        </a>
+                    </td>
+                    <td th:text="${m.phone}">Phone</td>
+                    <td th:text="${m.email}">Email</td>
+                    <td th:text="${m.age}">25</td>
+                    <td th:text="${m.gender}">Male</td>
+                    <td th:text="${#temporals.format(m.joinDate, 'dd MMM yyyy')}">01 Jan 2025</td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/members/view/{id}(id=${m.id})}" class="btn btn-secondary btn-sm">View</a>
+                            <a th:href="@{/members/edit/{id}(id=${m.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a th:href="@{/members/delete/{id}(id=${m.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this member?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(members)}">
+                    <td colspan="8" style="text-align:center;padding:40px;color:var(--tx-muted);">
+                        No members found. <a th:href="@{/members/add}" style="color:var(--vi);">Add your first member →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

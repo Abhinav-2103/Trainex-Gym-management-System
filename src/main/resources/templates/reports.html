@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Reports | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Date Filter Bar -->
+    <div class="filter-bar">
+        <form th:action="@{/reports}" method="get" style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" name="startDate" class="form-control" th:value="${startDate}" style="width:200px;">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" name="endDate" class="form-control" th:value="${endDate}" style="width:200px;">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <span class="material-symbols-rounded" style="font-size:16px;">filter_alt</span> Filter
+            </button>
+            <a th:href="@{/reports}" class="btn btn-secondary btn-sm">Reset</a>
+        </form>
+    </div>
+
+    <!-- Revenue Summary -->
+    <div class="kpi-grid" style="margin-bottom:24px;">
+        <a th:href="@{/payments}" class="kpi-card" title="View all payments & revenue">
+            <div class="kpi-label">Total Lifetime Revenue</div>
+            <div class="kpi-value">₹<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 0)}">0</span></div>
+            <div class="kpi-hint" style="font-size:12px;color:var(--vi-light);margin-top:6px;">View Payments Ledger &rarr;</div>
+        </a>
+        <a th:href="@{/payments}" class="kpi-card" th:if="${filteredRevenue != null}" title="View filtered revenue transactions">
+            <div class="kpi-label">Filtered Revenue</div>
+            <div class="kpi-value" style="color:var(--vi-light);">₹<span th:text="${#numbers.formatDecimal(filteredRevenue, 1, 0)}">0</span></div>
+            <div class="kpi-hint" style="font-size:12px;color:var(--vi-light);margin-top:6px;">View Transactions Below &rarr;</div>
+        </a>
+        <a th:href="@{/subscriptions}" class="kpi-card" title="View and manage active subscriptions">
+            <div class="kpi-label">Active Subscriptions</div>
+            <div class="kpi-value" style="color:var(--green);" th:text="${#lists.size(activeSubscriptions)}">0</div>
+            <div class="kpi-hint" style="font-size:12px;color:var(--green);margin-top:6px;">Manage Subscriptions &rarr;</div>
+        </a>
+        <a th:href="@{/subscriptions}" class="kpi-card" title="View and renew expired subscriptions">
+            <div class="kpi-label">Expired Subscriptions</div>
+            <div class="kpi-value" style="color:var(--red);" th:text="${#lists.size(expiredSubscriptions)}">0</div>
+            <div class="kpi-hint" style="font-size:12px;color:var(--red);margin-top:6px;">Renew Subscriptions &rarr;</div>
+        </a>
+    </div>
+
+    <!-- Filtered Payments (if date range selected) -->
+    <div th:if="${filteredPayments != null}" style="margin-bottom:24px;">
+        <h3 style="font:600 16px var(--font);margin-bottom:12px;">
+            Transactions: <span th:text="${startDate}">2025-01-01</span> → <span th:text="${endDate}">2025-12-31</span>
+        </h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Member</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p, stat : ${filteredPayments}">
+                        <td th:text="${stat.index + 1}">1</td>
+                        <td>
+                            <a th:href="@{/members/view/{id}(id=${p.member.id})}" class="member-link" th:title="'View ' + ${p.member.name} + '\'s profile'">
+                                <div class="avatar" style="width:28px;height:28px;font-size:12px;" th:text="${#strings.substring(p.member.name, 0, 1)}">A</div>
+                                <span class="name" th:text="${p.member.name}">Member</span>
+                            </a>
+                        </td>
+                        <td style="font-weight:600;color:var(--green);" th:text="'₹' + ${#numbers.formatDecimal(p.amount, 1, 0)}">₹999</td>
+                        <td>
+                            <span class="badge" style="background:rgba(77,166,255,0.12);color:#4da6ff;" th:text="${p.paymentMode}">UPI</span>
+                        </td>
+                        <td th:text="${#temporals.format(p.paymentDate, 'dd MMM yyyy')}">01 Jan</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(filteredPayments)}">
+                        <td colspan="5" style="text-align:center;padding:24px;color:var(--tx-muted);">No transactions found in this range.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Active Subscriptions -->
+    <div style="margin-bottom:24px;">
+        <h3 style="font:600 16px var(--font);margin-bottom:12px;color:var(--green);">
+            <span class="material-symbols-rounded" style="font-size:18px;vertical-align:middle;">check_circle</span>
+            Active Subscriptions
+        </h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Plan</th>
+                        <th>Start</th>
+                        <th>End</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="s : ${activeSubscriptions}">
+                        <td>
+                            <a th:href="@{/members/view/{id}(id=${s.member.id})}" class="member-link" th:title="'View ' + ${s.member.name} + '\'s profile'">
+                                <div class="avatar" style="width:28px;height:28px;font-size:12px;" th:text="${#strings.substring(s.member.name, 0, 1)}">A</div>
+                                <span class="name" th:text="${s.member.name}">Member</span>
+                            </a>
+                        </td>
+                        <td th:text="${s.plan.planName}">Plan</td>
+                        <td th:text="${#temporals.format(s.startDate, 'dd MMM yyyy')}">01 Jan</td>
+                        <td th:text="${#temporals.format(s.endDate, 'dd MMM yyyy')}">01 Apr</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(activeSubscriptions)}">
+                        <td colspan="4" style="text-align:center;padding:20px;color:var(--tx-muted);">No active subscriptions.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Expired Subscriptions -->
+    <div>
+        <h3 style="font:600 16px var(--font);margin-bottom:12px;color:var(--red);">
+            <span class="material-symbols-rounded" style="font-size:18px;vertical-align:middle;">cancel</span>
+            Expired Subscriptions
+        </h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Plan</th>
+                        <th>Start</th>
+                        <th>Expired On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="s : ${expiredSubscriptions}">
+                        <td>
+                            <a th:href="@{/members/view/{id}(id=${s.member.id})}" class="member-link" th:title="'View ' + ${s.member.name} + '\'s profile'">
+                                <div class="avatar" style="width:28px;height:28px;font-size:12px;" th:text="${#strings.substring(s.member.name, 0, 1)}">A</div>
+                                <span class="name" th:text="${s.member.name}">Member</span>
+                            </a>
+                        </td>
+                        <td th:text="${s.plan.planName}">Plan</td>
+                        <td th:text="${#temporals.format(s.startDate, 'dd MMM yyyy')}">01 Jan</td>
+                        <td style="color:var(--red);" th:text="${#temporals.format(s.endDate, 'dd MMM yyyy')}">01 Feb</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(expiredSubscriptions)}">
+                        <td colspan="4" style="text-align:center;padding:20px;color:var(--tx-muted);">No expired subscriptions.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

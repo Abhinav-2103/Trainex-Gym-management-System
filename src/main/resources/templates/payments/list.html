@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Payments | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Revenue Summary -->
+    <div class="kpi-grid" style="margin-bottom:20px;">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Lifetime Revenue</div>
+            <div class="kpi-value">₹<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 0)}">0</span></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">This Month's Revenue</div>
+            <div class="kpi-value">₹<span th:text="${#numbers.formatDecimal(monthlyRevenue, 1, 0)}">0</span></div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <span style="color:var(--tx-muted);font-size:13px;" th:text="'Showing ' + ${#lists.size(payments)} + ' transactions'"></span>
+        <a th:href="@{/payments/add}" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">add_circle</span> Record Payment
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Member</th>
+                    <th>Amount</th>
+                    <th>Payment Mode</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p, stat : ${payments}">
+                    <td th:text="${stat.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/members/view/{id}(id=${p.member.id})}" class="member-link" th:title="'View ' + ${p.member.name} + '\'s profile'">
+                            <div class="member-cell">
+                                <div class="avatar" th:text="${#strings.substring(p.member.name, 0, 1)}">A</div>
+                                <span class="name" th:text="${p.member.name}">Member</span>
+                            </div>
+                        </a>
+                    </td>
+                    <td style="font-weight:600;color:var(--green);" th:text="'₹' + ${#numbers.formatDecimal(p.amount, 1, 0)}">₹999</td>
+                    <td>
+                        <span class="badge" style="background:rgba(77,166,255,0.12);color:#4da6ff;" th:text="${p.paymentMode}">UPI</span>
+                    </td>
+                    <td th:text="${#temporals.format(p.paymentDate, 'dd MMM yyyy')}">01 Jan</td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/payments/edit/{id}(id=${p.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a th:href="@{/payments/delete/{id}(id=${p.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this payment?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="6" style="text-align:center;padding:40px;color:var(--tx-muted);">
+                        No payments recorded. <a th:href="@{/payments/add}" style="color:var(--vi);">Record one →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

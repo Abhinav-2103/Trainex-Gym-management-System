@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Payment Form | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <a th:href="@{/payments}" class="btn btn-secondary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span> Back to Payments
+        </a>
+    </div>
+
+    <div class="form-card">
+        <form th:action="@{/payments/save}" th:object="${payment}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label for="member">Member *</label>
+                <select id="member" th:field="*{member.id}" class="form-control">
+                    <option value="">-- Select Member --</option>
+                    <option th:each="m : ${members}" th:value="${m.id}" th:text="${m.name}">Member</option>
+                </select>
+                <div class="form-error" th:if="${#fields.hasErrors('member')}" th:errors="*{member}"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="amount">Amount (₹) *</label>
+                    <input type="number" id="amount" th:field="*{amount}" class="form-control" placeholder="2499" min="1" step="0.01">
+                    <div class="form-error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="paymentMode">Payment Mode *</label>
+                    <select id="paymentMode" th:field="*{paymentMode}" class="form-control">
+                        <option value="">-- Select Mode --</option>
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Card">Card</option>
+                        <option value="Online">Online</option>
+                    </select>
+                    <div class="form-error" th:if="${#fields.hasErrors('paymentMode')}" th:errors="*{paymentMode}"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="paymentDate">Payment Date *</label>
+                <input type="date" id="paymentDate" th:field="*{paymentDate}" class="form-control">
+                <div class="form-error" th:if="${#fields.hasErrors('paymentDate')}" th:errors="*{paymentDate}"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+                <span class="material-symbols-rounded" style="font-size:18px;">save</span>
+                Save Payment
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

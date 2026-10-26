@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
+<head><title>Trainers | TRAINEX</title></head>
+<body>
+<div layout:fragment="content">
+
+    <div class="toolbar">
+        <span style="color:var(--tx-muted);font-size:13px;" th:text="'Showing ' + ${#lists.size(trainers)} + ' trainers'"></span>
+        <a th:href="@{/trainers/add}" class="btn btn-primary btn-sm">
+            <span class="material-symbols-rounded" style="font-size:16px;">person_add</span> Add Trainer
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Trainer</th>
+                    <th>Phone</th>
+                    <th>Specialization</th>
+                    <th>Monthly Salary</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="t, stat : ${trainers}">
+                    <td th:text="${stat.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/trainers/edit/{id}(id=${t.id})}" class="member-link" th:title="'Edit ' + ${t.name}">
+                            <div class="member-cell">
+                                <div class="avatar" style="background:linear-gradient(135deg,#f5a623,#e08c00);" th:text="${#strings.substring(t.name, 0, 1)}">V</div>
+                                <span class="name" th:text="${t.name}">Trainer</span>
+                            </div>
+                        </a>
+                    </td>
+                    <td th:text="${t.phone}">Phone</td>
+                    <td>
+                        <span class="badge" style="background:var(--amber-bg);color:var(--amber);" th:text="${t.specialization}">CrossFit</span>
+                    </td>
+                    <td style="font-weight:600;" th:text="'₹' + ${#numbers.formatDecimal(t.salary, 1, 0)}">₹35,000</td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/trainers/edit/{id}(id=${t.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a th:href="@{/trainers/delete/{id}(id=${t.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this trainer?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(trainers)}">
+                    <td colspan="6" style="text-align:center;padding:40px;color:var(--tx-muted);">
+                        No trainers found. <a th:href="@{/trainers/add}" style="color:var(--vi);">Add one →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

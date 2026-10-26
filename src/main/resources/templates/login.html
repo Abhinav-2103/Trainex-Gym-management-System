@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TRAINEX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <style>
+        :root { --bg:#050510; --vi:#9312ff; --vi-dark:#7a1cf8; --tx:#f0eef5; --tx-muted:#8b8998; --border:rgba(255,255,255,0.08); --surface:rgba(255,255,255,0.04); --green:#45b558; --red:#f03b2a; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { height:100%; }
+        body {
+            background: #04020a;
+            color: var(--tx);
+            font: 400 14px/1.5 'Inter',system-ui,sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('/images/watermark.png') no-repeat center center;
+            background-size: cover;
+            opacity: 0.32;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(4,2,10,0.3) 0%, rgba(4,2,10,0.65) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .login-card { position:relative; z-index:1; width:420px; background:rgba(10,8,20,0.85); border:1px solid var(--border); border-radius:18px; padding:44px 36px; backdrop-filter:blur(24px); box-shadow:0 0 80px rgba(147,18,255,0.1); }
+        .login-card::before { content:''; position:absolute; top:0; left:10%; right:10%; height:2px; background:linear-gradient(90deg,transparent,#c58bff,transparent); box-shadow:0 0 20px 2px var(--vi); border-radius:2px; }
+        .logo { text-align:center; margin-bottom:28px; }
+        .logo .brand-img { width:72px; height:72px; border-radius:18px; object-fit:cover; border:2px solid rgba(160,32,255,0.45); box-shadow:0 0 30px rgba(160,32,255,0.4), 0 0 16px rgba(0,229,255,0.25); margin-bottom:12px; }
+        .logo h1 { font:700 28px 'Space Grotesk',sans-serif; letter-spacing:0.04em; background:linear-gradient(135deg,#ffffff 40%,#c084fc 80%,#38bdf8 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .logo p { color:var(--tx-muted); font-size:14px; margin-top:4px; }
+        .form-group { margin-bottom:18px; }
+        .form-group label { display:block; font-size:13px; font-weight:500; color:var(--tx-muted); margin-bottom:6px; }
+        .form-control { width:100%; padding:12px 16px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border); color:var(--tx); font:400 14px 'Inter'; outline:none; transition:border-color 0.2s, box-shadow 0.2s; }
+        .form-control:focus { border-color:var(--vi); box-shadow:0 0 0 3px rgba(147,18,255,0.15); }
+        .form-control::placeholder { color:var(--tx-muted); }
+        .btn-login { width:100%; padding:13px; border:none; border-radius:99px; background:linear-gradient(135deg,#a020ff,var(--vi-dark)); color:#fff; font:600 15px 'Inter'; cursor:pointer; margin-top:6px; transition:all 0.25s; box-shadow:0 2px 20px rgba(147,18,255,0.35); }
+        .btn-login:hover { filter:brightness(1.15); box-shadow:0 4px 32px rgba(147,18,255,0.55); }
+        .alert { padding:10px 16px; border-radius:8px; font-size:13px; font-weight:500; margin-bottom:18px; display:flex; align-items:center; gap:6px; }
+        .alert-success { background:rgba(69,181,88,0.12); border:1px solid rgba(69,181,88,0.3); color:var(--green); }
+        .alert-error { background:rgba(240,59,42,0.12); border:1px solid rgba(240,59,42,0.3); color:var(--red); }
+        .register-link { text-align:center; margin-top:20px; font-size:13px; color:var(--tx-muted); }
+        .register-link a { color:var(--vi); text-decoration:none; font-weight:600; }
+        .register-link a:hover { text-decoration:underline; }
+        .remember { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--tx-muted); margin-bottom:12px; }
+        .remember input[type="checkbox"] { accent-color:var(--vi); }
+    </style>
+</head>
+<body>
+    <canvas class="stars" id="stars"></canvas>
+    <div class="login-card">
+        <div class="logo">
+            <img th:src="@{/images/logo.png}" alt="TRAINEX" class="brand-img">
+            <h1>TRAINEX</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        <!-- Flash Alerts -->
+        <div class="alert alert-success" th:if="${param.logout}">
+            <span class="material-symbols-rounded" style="font-size:18px;">check_circle</span>
+            You have been logged out successfully.
+        </div>
+        <div class="alert alert-success" th:if="${success}">
+            <span class="material-symbols-rounded" style="font-size:18px;">check_circle</span>
+            <span th:text="${success}"></span>
+        </div>
+        <div class="alert alert-error" th:if="${param.error}">
+            <span class="material-symbols-rounded" style="font-size:18px;">error</span>
+            Invalid username or password!
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+            <div class="remember">
+                <input type="checkbox" id="remember-me" name="remember-me">
+                <label for="remember-me" style="margin-bottom:0;color:inherit;">Remember me</label>
+            </div>
+            <button type="submit" class="btn-login">Sign In</button>
+        </form>
+
+        <div class="register-link">
+            Don't have an account? <a th:href="@{/register}">Register here</a>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            var c=document.getElementById('stars'),x=c.getContext('2d');
+            function draw(){var w=innerWidth,h=innerHeight,d=Math.min(devicePixelRatio||1,2);c.width=w*d;c.height=h*d;x.setTransform(d,0,0,d,0,0);
+            x.clearRect(0,0,w,h);
+            for(var i=0;i<180;i++){x.globalAlpha=.25+Math.random()*.5;x.fillStyle='#fff';x.beginPath();x.arc(Math.random()*w,Math.random()*h,.4+Math.random()*1,0,6.283);x.fill();}
+            }
+            draw();addEventListener('resize',draw);
+        })();
+    </script>
+</body>
+</html>
